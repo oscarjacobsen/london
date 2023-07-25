@@ -31,25 +31,44 @@
         attribution: "© OpenStreetMap",
       }).addTo(map);
 
-      function addKolumbusVehiclesToMap(map) {
+      //function addKolumbusVehiclesToMap(map) {
 
-        let url = "https://api.kolumbus.no/api/vehicles/realtimehub"
+      //  let url = "https://api.kolumbus.no/api/vehicles/realtimehub"
 
-        fetch(url, {
-          method: "GET",
-          mode: "no-cors",
-          headers: {'Content-Type': 'application/json'},
-        }).then((response) => {
+      //  fetch(url, {
+      //    method: "GET",
+      //    mode: "cors",
+      //    headers: {'Content-Type': 'application/json'},
+      //  }).then((response) => {
 
-            console.log(response)
+      //      console.log(response)
 
-          //console.log(response.json())
+      //console.log(response.json())
+      //  });
+
+      //  var marker = L.marker([51.5, -0.09]).addTo(map);
+      //}
+
+      // Replace 'your_url_here' with the actual URL from which you want to get the JSON response.
+      const apiUrl = "https://api.kolumbus.no/api/vehicles/realtimehub";
+
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      //const apiUrl = "your_url_here"; // Replace with the actual JSON API URL
+
+      // Fetch the JSON data using the CORS proxy
+      fetch(apiUrl, {
+        mode: "no-cors",
+        referrerPolicy: "unsafe-url"
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data); // Do something with the JSON data
+        })
+        .catch((error) => {
+          console.error("Error:", error);
         });
 
-        var marker = L.marker([51.5, -0.09]).addTo(map);
-      }
-
-      addKolumbusVehiclesToMap(map);
+      //addKolumbusVehiclesToMap(map);
     </script>
   </body>
 </html>
