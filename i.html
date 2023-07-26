@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Draw Circle on ArcGIS Map</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.21/"></script>
+</head>
+<body>
+  <div id="viewDiv" style="height: 500px;"></div>
+  <script>
+    // Replace "YOUR_ARCGIS_API_KEY" with your actual ArcGIS API key
+    require(["esri/Map", "esri/views/MapView", "esri/Graphic", "esri/geometry/Circle"], function(Map, MapView, Graphic, Circle) {
+      const map = new Map({
+        basemap: "topo-vector"
+      });
+
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [0, 0], // Set the center of the map here
+        zoom: 3 // Set the desired zoom level here
+      });
+
+      // Function to draw a circle on the map
+      function drawCircle(center, radius) {
+        const circle = new Circle({
+          center: center,
+          geodesic: true,
+          radius: radius
+        });
+
+        const circleGraphic = new Graphic({
+          geometry: circle,
+          symbol: {
+            type: "simple-fill",
+            color: [255, 0, 0, 0.5], // Circle fill color (red with 50% opacity)
+            outline: {
+              color: [255, 0, 0], // Circle outline color (red)
+              width: 2 // Circle outline width
+            }
+          }
+        });
+
+        view.graphics.add(circleGraphic);
+      }
+
+      // Call the function to draw the circle at a specific location with a given radius
+      const circleCenter = [-122.4194, 37.7749]; // Longitude and Latitude of the circle center
+      const circleRadiusInMeters = 100000; // Set the radius of the circle in meters here
+      drawCircle(circleCenter, circleRadiusInMeters);
+    });
+  </script>
+</body>
+</html>

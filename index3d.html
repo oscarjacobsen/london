@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Draw Cylinder on 3D ArcGIS Map</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.21/"></script>
+</head>
+<body>
+  <div id="viewDiv" style="height: 500px;"></div>
+  <script>
+    // Replace "YOUR_ARCGIS_API_KEY" with your actual ArcGIS API key
+    require(["esri/Map", "esri/views/SceneView", "esri/Graphic", "esri/geometry/support/webMercatorUtils"], function(Map, SceneView, Graphic, webMercatorUtils) {
+      const map = new Map({
+        basemap: "topo-vector"
+      });
+
+      const view = new SceneView({
+        container: "viewDiv",
+        map: map,
+        camera: {
+          position: [7.654, 45.919, 5000000], // Set the initial camera position (longitude, latitude, altitude)
+          tilt: 70 // Set the tilt angle of the camera (0 is top-down, 90 is straight down)
+        }
+      });
+
+      // Function to draw a cylinder on the map
+      function drawCylinder(center, radius, height) {
+        const cylinder = {
+          type: "polygon",
+          rings: [],
+          spatialReference: view.spatialReference
+        };
+
+        const segments = 50; // Number of sides of the cylinder
+        for (let i = 0; i <= segments; i++) {
+          const theta = (i / segments) * 2 * Math.PI;
+          const x = center[0] + radius * Math.cos(theta);
+          const y = center[1] + radius * Math.sin(theta);
+          cylinder.rings.push([x, y]);
+        }
+        cylinder.rings.push(cylinder.rings[0]); // Close the cylinder polygon
+
+        const cylinderGraphic = new Graphic({
+          geometry: webMercatorUtils.geographicToWebMercator(cylinder),
+          symbol: {
+            type: "simple-fill",
+            color: [255, 0, 0, 0.5] // Cylinder color (red with 50% opacity)
+          }
+        });
+
+        view.graphics.add(cylinderGraphic);
+      }
+
+      // Call the function to draw the cylinder at a specific location with a given radius and height
+      const cylinderCenter = [-122.4194, 37.7749]; // Longitude and Latitude of the cylinder center
+      const cylinderRadiusInMeters = 100000; // Set the radius of the cylinder in meters here
+      const cylinderHeightInMeters = 100000; // Set the height of the cylinder in meters here
+      drawCylinder(cylinderCenter, cylinderRadiusInMeters, cylinderHeightInMeters);
+    });
+  </script>
+</body>
+</html>
