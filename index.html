@@ -15,8 +15,12 @@
     ></script>
 
     <style>
+      html, body {
+        margin: 0;
+  height: 100%;
+}
       #map {
-        height: 500px;
+        height: 100%;
         background: pink;
       }
     </style>
@@ -25,6 +29,14 @@
     <div id="map"></div>
 
     <script>
+
+      let unifiedAPIPrimaryKey = "ee54b262aa69467485c83686e4359d9e"
+      let unifiedAPISecondaryKey = "47a7ac14237849bfb091ea80e87b1481"
+      let headers = {
+        'Cache-Control': 'no-cache',
+        "app_id": unifiedAPIPrimaryKey,
+        "app_key": unifiedAPISecondaryKey
+      }
       let st = [
         "bakerloo", 
         "circle", 
@@ -39,31 +51,36 @@
         "waterloo-city"
       ]
       let col = {
-        "bakerloo": "red", 
-        "circle": "yellow", 
-        "central": "green",
-        "district": "blue",
-        "hammersmith-city": "purple",
-        "jubilee": "orange",
-        "metropolitan": "white",
-        "northern": "beige",
-        "piccadilly": "pink",
-        "victoria": "grey",
-        "waterloo-city": "darkred"
+        "bakerloo": {"color": "#b05f0f", "radius": 20}, 
+        "circle": {"color": "#fed105", "radius": 40},
+        "central": {"color": "#ee2e22", "radius": 60},
+        "district": {"color": "#00843d", "radius": 80},
+        "hammersmith-city": {"color": "#f386a0", "radius": 100},
+        "jubilee": {"color": "#959ca1", "radius": 120},
+        "metropolitan": {"color": "#97015e", "radius": 140},
+        "northern": {"color": "#white", "radius": 160},
+        "piccadilly": {"color": "#1b3f94", "radius": 180},
+        "victoria": {"color": "#069ddc", "radius": 200},
+        "waterloo-city": {"color": "#84cdbc", "radius": 220}
 
       }
-      var map = L.map("map").setView([51.505, -0.09], 12);
+
+      var lineList = []
+      var lineCol = ""
+
+      var stationRadius = 20
+
+      var map = L.map("map").setView([51.505, -0.09], 11);
 
       L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: "© OpenStreetMap",
+        attribution: "© CartooDB",
       }).addTo(map);
 
       fetch('https://api.tfl.gov.uk/Line/Mode/tube/Route', {
         method: 'GET',
         // Request headers
-        headers: {
-            'Cache-Control': 'no-cache',}
+        headers: headers
     })
     .then(response => {
         console.log(response.status);
@@ -78,32 +95,45 @@
 
     //var marker = L.marker([51.5, -0.09]).addTo(map);
 
+    
+
     st.forEach(stationName=>{
 
       fetch('https://api.tfl.gov.uk/Line/' + stationName + '/StopPoints', {
         method: 'GET',
         // Request headers
-        headers: {
-            'Cache-Control': 'no-cache',}
+        headers: headers
     })
     .then(response => {
+
+      lineList = []
+      var polyline = L.polyline(lineList, {color: "red"}).addTo(map);
+
         console.log(response.status);
 
         response.json().then(data=>{
           data.forEach(t=>{
 
+            //polyline.addLatLng([t["lat"], t["lon"]])
+            //polyline.setStyle({"color": col[stationName]["color"]})
+
             var circle = L.circle([t["lat"], t["lon"]], {
-              color: col[stationName],
-              fillColor: '#f03',
-              fillOpacity: 0.5,
-              radius: 50
+              color: col[stationName]["color"],
+              //fillColor: transparent,
+              fillOpacity: 0,
+              radius: col[stationName]["radius"],
           }).addTo(map);
 
             //L.marker([t["lat"], t["lon"]]).addTo(map)
           })
-        })
 
-        console.log(response.text());
+          stationRadius = stationRadius + 20
+
+        })
+        console.log(lineList)
+        
+
+        //console.log(response.text());
     })
     .catch(err => console.error(err));
 
